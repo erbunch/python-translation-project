@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import sys
+import re
 
 def translate_sequence(rna_sequence, genetic_code):
     """Translates a sequence of RNA into a sequence of amino acids.
@@ -71,6 +72,19 @@ def get_all_translations(rna_sequence, genetic_code):
         A list of strings; each string is an sequence of amino acids encoded by
         `rna_sequence`.
     """
+    seqs = []
+    seqs.append(rna_sequence)
+    right = ''
+    for i in range(len(rna_sequence) - 3, -1, -3)):
+        codon = rna_sequence[i : i+3]
+        right += codon
+    seqs.append(right)
+    re_pattern_string = r'AUG.+'
+    re_pattern_obj = re.compile(re_pattern_string, re.IGNORECASE)
+    start = re_pattern_obj.findall(sequence)
+    seqs.append(start)
+
+
     pass
 
 def get_reverse(sequence):
