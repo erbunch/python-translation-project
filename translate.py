@@ -41,6 +41,13 @@ def translate_sequence(rna_sequence, genetic_code):
                 break
     return translation
 
+def find_frame(seq):
+    for i in range(0, len(seq), 3):
+        codon = seq[i:i+3]
+        if codon == 'aug' or codon == 'AUG':
+            return seq[i:]
+    return ''
+
 def get_all_translations(rna_sequence, genetic_code):
     """Get a list of all amino acid sequences encoded by an RNA sequence.
 
@@ -73,19 +80,21 @@ def get_all_translations(rna_sequence, genetic_code):
         `rna_sequence`.
     """
     seqs = []
+    new = []
+    things = []
+    rf2 = rna_sequence[1:-2]
+    rf3 = rna_sequence[2:-1]
     seqs.append(rna_sequence)
-    right = ''
-    for i in range(len(rna_sequence) - 3, -1, -3)):
-        codon = rna_sequence[i : i+3]
-        right += codon
-    seqs.append(right)
-    re_pattern_string = r'AUG.+'
-    re_pattern_obj = re.compile(re_pattern_string, re.IGNORECASE)
-    start = re_pattern_obj.findall(sequence)
-    seqs.append(start)
-
-
-    pass
+    seqs.append(rf2)
+    seqs.append(rf3)
+    for seq in seqs:
+        nseq = find_frame(seq)
+        tran = translate_sequence(nseq, genetic_code)
+        new.append(tran)
+    for thing in new:
+        if thing != '':
+            things.append(thing)
+    return things
 
 def get_reverse(sequence):
     """Reverse orientation of `sequence`.
@@ -165,7 +174,16 @@ def get_longest_peptide(rna_sequence, genetic_code):
         A string of the longest sequence of amino acids encoded by
         `rna_sequence`.
     """
-    pass
+    trans = get_all_translations(rna_sequence, genetic_code)
+    revcomp = reverse_and_complement(rna_sequence)
+    revcomp_trans = get_all_translations(revcomp, genetic_code)
+    for item in revcomp_trans:
+        trans.append(item)
+    if len(trans) == 0:
+        return ''
+    else:
+        return max(trans, key=len)
+
 
 
 if __name__ == '__main__':
