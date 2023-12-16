@@ -5,7 +5,7 @@ import re
 
 def vet_nucleotide_sequence(sequence):
     """
-    Return None if `sequence` is a valid RNA or DNA sequence, else raise exception. 
+    Return None if `sequence` is a valid RNA or DNA sequence, else raise exception.
 
     Parameters
     ----------
@@ -61,9 +61,8 @@ def vet_nucleotide_sequence(sequence):
     dna_pattern_str = r'ATCG'
     ##########################################################################
 
-    rna_pattern = re.compile(rna_pattern_str)
-    dna_pattern = re.compile(dna_pattern_str)
-
+    rna_pattern = re.compile(r'^[AUCG]*$', re.IGNORECASE)
+    dna_pattern = re.compile(r'^[ATCG]*$', re.IGNORECASE)
     if rna_pattern.match(sequence):
         return
     if dna_pattern.match(sequence):
@@ -75,7 +74,7 @@ def vet_nucleotide_sequence(sequence):
 
 def vet_codon(codon):
     """
-    Return None if `codon` is a valid RNA codon, else raise an exception. 
+    Return None if `codon` is a valid RNA codon, else raise an exception.
 
     Parameters
     ----------
@@ -94,7 +93,7 @@ def vet_codon(codon):
     >>> vet_codon('AUG') == None
     True
 
-    lower-case is also vaild 
+    lower-case is also vaild
     >>> vet_codon('aug') == None
     True
 
@@ -122,7 +121,7 @@ def vet_codon(codon):
     codon_pattern_str = r'AUG'
     ##########################################################################
 
-    codon_pattern = re.compile(codon_pattern_str)
+    codon_pattern = re.compile(r'^[AUCG]{3}$', re.IGNORECASE)
 
     if codon_pattern.match(codon):
         return
@@ -211,7 +210,9 @@ def find_first_orf(sequence,
     ##########################################################################
 
     # Create the regular expression object
-    orf_pattern = re.compile(orf_pattern_str)
+    start_pattern = '|'.join(start_codons)
+    stop_pattern = '|'.join(stop_codons)
+    orf_pattern = re.compile(start_pattern + r'(?:[AUCG]{3})*(' + stop_pattern + ')')
     # Search the sequence
     match_object = orf_pattern.search(seq)
     if match_object:
